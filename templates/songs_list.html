@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <title>DJ Kasch Kenya Songs</title>
+</head>
+<body>
+  <h1>Songs by DJ Kasch Kenya</h1>
+
+  {% if songs %}
+    <ul>
+      {% for song in songs %}
+        <li>
+          <a href="{{ song.link }}" target="_blank">{{ song.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No songs found.</p>
+  {% endif %}
+
+</body>
+</html>

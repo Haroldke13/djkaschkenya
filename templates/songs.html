@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DJ Kasch Kenya Songs</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-dark text-light">
+<div class="container py-4">
+    <h1 class="mb-4">🎶 DJ Kasch Kenya Songs</h1>
+    
+    {% if songs %}
+        <div class="row">
+            {% for song in songs %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ song.image }}" class="card-img-top" alt="{{ song.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ song.link }}" target="_blank">{{ song.title }}</a>
+                            </h5>
+                            <p class="card-text"><strong>Artist:</strong> {{ song.artist }}</p>
+                            {% if song.featured %}
+                                <p class="card-text">
+                                    <strong>Feat:</strong> {{ ", ".join(song.featured) }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No songs found.</p>
+    {% endif %}
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <i class="bi bi-person-plus-fill text-success" style="font-size:3rem;"></i>
+    <h2 class="fw-bold mt-2">Create Your Account</h2>
+    <p class="text-muted">Fill in your details and capture face data for secure login</p>
+  </div>
+
+  <!-- Signup Form -->
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-4">
+      <form id="signupForm" method="POST">
+        <!-- First Name -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-person-fill me-2"></i>First Name</label>
+          <input type="text" name="fname" class="form-control rounded-pill" placeholder="Enter first name" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-person-fill me-2"></i>Last Name</label>
+          <input type="text" name="lname" class="form-control rounded-pill" placeholder="Enter last name" required>
+        </div>
+
+        <!-- DOB -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-calendar-date-fill me-2"></i>Date of Birth</label>
+          <input type="date" name="dob" class="form-control rounded-pill" required>
+        </div>
+
+        <!-- Phone -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-telephone-fill me-2"></i>Phone</label>
+          <input type="text" name="phone" class="form-control rounded-pill" placeholder="Enter phone number" required>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-envelope-fill me-2"></i>Email</label>
+          <input type="email" name="email" class="form-control rounded-pill" placeholder="Enter email address" required>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-shield-lock-fill me-2"></i>Password</label>
+          <div class="input-group">
+            <input type="password" name="passwd" id="passwd" class="form-control rounded-start-pill" placeholder="Enter password" required>
+            <button type="button" class="btn btn-outline-secondary rounded-end-pill" id="togglePassword">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Town -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-geo-alt-fill me-2"></i>Town</label>
+          <input type="text" name="town" class="form-control rounded-pill" placeholder="Enter town" required>
+        </div>
+
+        <!-- County -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-map-fill me-2"></i>County</label>
+          <input type="text" name="county" class="form-control rounded-pill" placeholder="Enter county" required>
+        </div>
+
+        <!-- Face Capture -->
+        <div class="mb-3 text-center">
+          <h4 class="text-primary"><i class="bi bi-camera-video-fill me-2"></i>Face Capture</h4>
+          <video id="video" width="320" height="240" autoplay class="border rounded shadow-sm mb-2"></video><br>
+          <button type="button" class="btn btn-outline-success btn-sm rounded-pill me-2" onclick="captureFrames()">
+            <i class="bi bi-camera-fill me-1"></i> Capture 100 Frames
+          </button>
+          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="submitSignupForm()">
+            <i class="bi bi-check-circle-fill me-1"></i> Submit Signup
+          </button>
+          <input type="hidden" name="face_data" id="face_data">
+        </div>
+        <!-- Divider -->
+        <div class="text-center my-3 text-muted">or</div>
+
+        <!-- Social Signup -->
+        <!-- Google Signup -->
+        <button type="button" class="btn btn-outline-dark btn-sm rounded-pill" onclick="submitGoogleSignupForm()">
+          <i class="bi bi-google me-2"></i> Sign up with Google
+        </button>
+        <input type="hidden" name="face_data" id="face_data_google">
+
+                
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+ <script>
+function submitGoogleSignupForm() {
+  if (capturedImages.length < 90) {
+    alert("⚠️ Please capture at least 90 frames before Google signup.");
+    return;
+  }
+  document.getElementById("face_data_google").value = JSON.stringify(capturedImages);
+
+  // Create a form dynamically
+  let form = document.createElement("form");
+  form.method = "POST";
+  form.action = "{{ url_for('google_signup') }}";
+
+  let input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "face_data";
+  input.value = document.getElementById("face_data_google").value;
+  form.appendChild(input);
+
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+
+<script>
+let capturedImages = [];
+let video = document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+  video.srcObject = stream;
+});
+
+// Capture 100 frames
+function captureFrames() {
+  capturedImages = [];
+  let count = 0;
+  let interval = setInterval(() => {
+    if (count >= 100) {
+      clearInterval(interval);
+      alert("✅ 100 frames captured successfully!");
+      return;
+    }
+    let canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    let imgData = canvas.toDataURL("image/png");
+    capturedImages.push(imgData);
+    count++;
+  }, 200); 
+}
+
+// Submit form with validation
+function submitSignupForm() {
+  if (capturedImages.length < 90) {
+    alert("⚠️ Please capture at least 90 frames before submitting.");
+    return;
+  }
+  document.getElementById("face_data").value = JSON.stringify(capturedImages);
+  document.getElementById("signupForm").submit();
+}
+
+// Toggle password visibility
+document.getElementById("togglePassword").addEventListener("click", function () {
+  const passwd = document.getElementById("passwd");
+  const icon = this.querySelector("i");
+  if (passwd.type === "password") {
+    passwd.type = "text";
+    icon.classList.replace("bi-eye", "bi-eye-slash");
+  } else {
+    passwd.type = "password";
+    icon.classList.replace("bi-eye-slash", "bi-eye");
+  }
+});
+</script>
+{% endblock %}

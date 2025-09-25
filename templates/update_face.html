@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Face Data</h2>
+<p>Password verified. Please capture new face data.</p>
+
+<video id="video" width="320" height="240" autoplay></video>
+<canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+<div class="mt-2">
+  <button type="button" class="btn btn-info" id="captureBtn">Capture Face</button>
+  <button type="button" class="btn btn-success" id="saveBtn">Save Face Data</button>
+</div>
+
+<script>
+let video = document.getElementById("video");
+navigator.mediaDevices.getUserMedia({video:true})
+  .then(stream => { video.srcObject = stream; })
+  .catch(err => console.error("Camera error", err));
+
+let capturedImages = [];
+
+document.getElementById("captureBtn").addEventListener("click", () => {
+  let canvas = document.getElementById("canvas");
+  let ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  let dataUrl = canvas.toDataURL("image/png");
+  capturedImages.push(dataUrl);
+  alert("Captured face image #" + capturedImages.length);
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (capturedImages.length < 5) {
+    alert("Capture at least 5 images!");
+    return;
+  }
+  fetch("/capture_face", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ images: capturedImages })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    window.location.href = "/face_verify";   // redirect back to login flow
+  })
+  .catch(err => console.error(err));
+});
+</script>
+{% endblock %}

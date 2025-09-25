@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Face Verification</h2>
+<video id="video" width="320" height="240" autoplay></video><br>
+<button onclick="verifyFace()">Verify Face</button>
+<p id="status"></p>
+
+<script>
+let video = document.getElementById("video");
+navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    video.srcObject = stream;
+});
+
+function verifyFace() {
+    let canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    let imgData = canvas.toDataURL("image/png");
+
+    document.getElementById("status").innerText = "Verifying...";
+
+    axios.post("/verify_face/{{ user_id }}", { image: imgData })
+        .then(res => {
+            alert(res.data.message);
+            window.location.href = "{{ url_for('home') }}";
+        })
+        .catch(err => {
+            document.getElementById("status").innerText = "Verification failed: " + err.response.data.message;
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Face Verification</h2>
+<p>Please look at the camera to complete login.</p>
+
+<video id="video" width="320" height="240" autoplay></video>
+<canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+<form method="POST">
+  <button type="submit" class="btn btn-primary mt-3">Verify Face</button>
+</form>
+
+<script>
+navigator.mediaDevices.getUserMedia({video:true})
+  .then(stream => { document.getElementById("video").srcObject = stream; })
+  .catch(err => console.error("Camera error", err));
+</script>
+{% endblock %}
