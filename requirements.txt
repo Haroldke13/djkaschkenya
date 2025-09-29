@@ -6,6 +6,7 @@ Flask
 Flask-WTF
 Flask-SQLAlchemy
 Flask-PyMongo
+flask_login
 Werkzeug
 pymongo
 gunicorn
