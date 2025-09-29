@@ -1,26 +1,21 @@
-Flask==3.0.3
-Flask-WTF==1.2.1
-Flask-SQLAlchemy==3.1.1
-Flask-PyMongo==2.3.0
-Werkzeug==2.3.7
-opencv-python==4.8.0.76
-numpy==1.25.2
-pymongo==4.5.0
-beautifulsoup4==4.12.2
-requests==2.31.0
-psycopg2-binary==2.9.9
-pymongo==4.10.1
-stripe==11.2.0
-paypalrestsdk==1.13.1
-gunicorn==23.0.0
-python-dotenv==1.0.1
-requests==2.32.3
-numpy==2.1.2
-pandas==2.2.3
-opencv-python==4.10.0.84
+# Core build tools
+setuptools
+wheel
+Flask
+Flask-WTF
+Flask-SQLAlchemy
+Flask-PyMongo
+Werkzeug
+pymongo
+gunicorn
+python-dotenv
+requests
+numpy
+pandas
+opencv-python
 opencv-python-headless
 opencv-python-contrib
-Werkzeug==3.0.4
+Werkzeug
 
 
 
