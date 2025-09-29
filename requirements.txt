@@ -21,6 +21,8 @@ pandas
 opencv-python
 opencv-python-headless
 Werkzeug
+flask_pymongo
+bson
 
 
 
