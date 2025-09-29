@@ -10,7 +10,7 @@ flask_login
 flask_migrate
 authlib
 alembic
-
+flask_mail
 Werkzeug
 pymongo
 gunicorn
