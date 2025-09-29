@@ -1,5 +1,5 @@
 # Core build tools
-python-3.11.9
+python
 setuptools
 wheel
 Flask
