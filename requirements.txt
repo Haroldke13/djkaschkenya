@@ -23,6 +23,7 @@ numpy
 pandas
 opencv-python
 opencv-python-headless
+opencv-contrib-python
 Werkzeug
 flask_pymongo
 bson
