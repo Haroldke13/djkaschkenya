@@ -10,11 +10,13 @@ flask_login
 flask_migrate
 authlib
 alembic
+SQLAlchemy
 flask_mail
 Werkzeug
 pymongo
 gunicorn
 python-dotenv
+beautifulsoup
 requests
 numpy
 pandas
@@ -23,3 +25,4 @@ opencv-python-headless
 Werkzeug
 flask_pymongo
 bson
+python-dotenv
