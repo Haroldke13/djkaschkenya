@@ -355,52 +355,73 @@ from flask import request, session
 FACE_DIR = "static/faces"
 
 @app.route("/verify_face/<user_id>", methods=["POST"])
-def verify_face_route(user_id):
+def verify_face(user_id):
     try:
         data = request.get_json()
-        if not data or "image" not in data:
-            return {"message": "No image data provided"}, 400
+        img_data = data["image"].split(",")[1]  # remove "data:image/png;base64,"
+        img_bytes = base64.b64decode(img_data)
 
-        # Decode base64 image
-        img_str = data.get("image")
-        img_data = base64.b64decode(img_str.split(",")[1])
-        nparr = np.frombuffer(img_data, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+        # Decode base64 → numpy array
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        frame_color = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        # Detect face(s)
+        if frame_color is None:
+            return {"message": "Failed to decode image"}, 400
+
+        # Save a debug image to inspect what the backend receives
+        debug_path = f"debug_{user_id}.jpg"
+        cv2.imwrite(debug_path, frame_color)
+        print(f"✅ Saved debug frame: {debug_path}, shape: {frame_color.shape}")
+
+        # Convert to grayscale for detection
+        gray = cv2.cvtColor(frame_color, cv2.COLOR_BGR2GRAY)
+
+        # Load Haar cascade
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
         )
-        faces = face_cascade.detectMultiScale(frame, 1.3, 5)
+
+        # Try to detect faces (looser parameters for testing)
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,    # lower for more sensitivity
+            minNeighbors=3,     # fewer neighbors, less strict
+            minSize=(50, 50)    # ignore tiny blobs
+        )
+
+        print(f"🔍 Faces detected: {len(faces)}")
 
         if len(faces) == 0:
-            return {"message": "No face detected. Please try again."}, 400
+            return {"message": "No face detected"}, 400
 
-        # Load trained model
-        model_path = os.path.join(FACE_DIR, f"user_{user_id}_model.xml")
-        if not os.path.exists(model_path):
-            return {"message": f"No trained model found for user {user_id}"}, 400
+        # Optionally draw rectangle and save debug detection result
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame_color, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        detected_path = f"debug_{user_id}_detected.jpg"
+        cv2.imwrite(detected_path, frame_color)
+        print(f"✅ Saved detection result: {detected_path}")
 
-        recognizer = cv2.face.LBPHFaceRecognizer_create()
-        recognizer.read(model_path)
+        # Load recognizer
+        recognizer = get_recognizer(user_id)
+        if not recognizer:
+            return {"message": "No trained model found"}, 400
 
-        # Predict on the first detected face
+        # Predict using first face found
         (x, y, w, h) = faces[0]
-        face_img = frame[y:y+h, x:x+w]
-        label, conf = recognizer.predict(face_img)
+        face_region = gray[y:y+h, x:x+w]
 
-        print(f"[DEBUG] user_id={user_id}, predicted_label={label}, confidence={conf}")
+        label, confidence = recognizer.predict(face_region)
+        print(f"Prediction → label: {label}, confidence: {confidence:.2f}")
 
-        # Adjust thresholds (LBPH: lower conf = better)
-        if conf < 65:  
-            session["user_id"] = user_id
-            return {"message": "Face verified successfully"}, 200
+        if confidence < 70:  # threshold
+            return {"message": "Face verified successfully!"}, 200
         else:
-            return {"message": "Face not recognized. Try again."}, 401
+            return {"message": "Face not recognized"}, 400
 
     except Exception as e:
-        print(f"[ERROR] verify_face_route: {e}")
-        return {"message": "Internal server error"}, 500
+        print("❌ Error in /verify_face:", str(e))
+        return {"message": "Internal Server Error"}, 500
+
 
 
 # -------------------- PROFILE --------------------
