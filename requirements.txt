@@ -16,7 +16,8 @@ Werkzeug
 pymongo
 gunicorn
 python-dotenv
-beautifulsoup
+beautifulsoup4
+lxml
 requests
 numpy
 pandas
