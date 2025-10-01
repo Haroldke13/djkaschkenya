@@ -354,7 +354,7 @@ from flask import request, session
 
 FACE_DIR = "static/faces"
 
-@app.route("/verify_face/<user_id>", methods=["POST"])
+"""@app.route("/verify_face/<user_id>", methods=["POST"])
 def verify_face(user_id):
     try:
         data = request.get_json()
@@ -421,7 +421,60 @@ def verify_face(user_id):
     except Exception as e:
         print("❌ Error in /verify_face:", str(e))
         return {"message": "Internal Server Error"}, 500
+"""
+from flask import session
 
+@app.route("/verify_face/<user_id>", methods=["POST"])
+def verify_face(user_id):
+    try:
+        data = request.get_json()
+        img_data = data["image"].split(",")[1]  # remove "data:image/png;base64,"
+        img_bytes = base64.b64decode(img_data)
+
+        # Decode base64 → numpy array
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        frame_color = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        if frame_color is None:
+            return {"message": "Failed to decode image"}, 400
+
+        # Convert to grayscale for detection
+        gray = cv2.cvtColor(frame_color, cv2.COLOR_BGR2GRAY)
+
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=3,
+            minSize=(50, 50)
+        )
+
+        if len(faces) == 0:
+            return {"message": "No face detected"}, 400
+
+        recognizer = get_recognizer(user_id)
+        if not recognizer:
+            return {"message": "No trained model found"}, 400
+
+        # Predict first face found
+        (x, y, w, h) = faces[0]
+        face_region = gray[y:y+h, x:x+w]
+        label, confidence = recognizer.predict(face_region)
+
+        if confidence < 70:  
+            # ✅ Mark user as logged in
+            session["user_id"] = user_id
+            session.modified = True  # ensure session is written
+            print(f"✅ Face verified for {user_id}, confidence={confidence:.2f}")
+            return {"message": "Face verified successfully!", "status": "ok"}, 200
+        else:
+            return {"message": "Face not recognized"}, 400
+
+    except Exception as e:
+        print("❌ Error in /verify_face:", str(e))
+        return {"message": "Internal Server Error"}, 500
 
 
 # -------------------- PROFILE --------------------
