@@ -23,6 +23,3 @@ opencv-python-headless
 Werkzeug
 flask_pymongo
 bson
-base64
-
-
