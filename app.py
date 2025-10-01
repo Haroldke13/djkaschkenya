@@ -28,12 +28,29 @@ from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
 from flask_mail import Mail, Message
 
+# Import dotenv
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "supersecretsfsdfasduflasuydluiasyro832o8472pp79824374893ef8adysopifyasouidyiasydo8qyeywq9p7d98sydyufasoidgha"
+
+
+
+
+# Secret key
+app.secret_key = os.getenv("SECRET_KEY")
 app.config["SECRET_KEY"] = app.secret_key
 
 # -------------------- DATABASE --------------------
-app.config["MONGO_URI"] = "mongodb://localhost:27017/dancehallapp"
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+app.config["MONGO_DBNAME"] = os.getenv("MONGO_DB_NAME")
+mongo = PyMongo(app)
+
+# Flask environment
+app.config["ENV"] = os.getenv("FLASK_ENV", "development")
+
 mongo = PyMongo(app)
 
 # Create Flask-Migrate object for migrations
