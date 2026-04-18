@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C Extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+venv.bak/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+nosetests.xml
+*.cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+.db
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Pytest
+.cache
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Temporary files
+*~
+*.tmp
+*.temp
+*.orig
+*.bak
