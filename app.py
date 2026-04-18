@@ -65,21 +65,24 @@ migrate.init_app(app, mongo)   # ⚠️ SQLAlchemy usually expected here
 oauth.init_app(app)
 
 # Email configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'juellharold@gmail.com'
-app.config['MAIL_PASSWORD'] = 'oykeghzvmoddyhns'
-app.config['MAIL_DEFAULT_SENDER'] = 'juellharold@gmail.com'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER') or os.getenv('MAIL_USERNAME')
 mail.init_app(app)
 
 # PDF output directory
 app.config['PDF_OUTPUT_DIR'] = os.path.join(app.root_path, 'static/billing_pdfs')
 
 # Google OAuth configuration
-app.config['GOOGLE_CLIENT_ID'] = '1052110297217-3pi3l4eqhktgocn2cjrvt03bqurvu2qq.apps.googleusercontent.com'
-app.config['GOOGLE_CLIENT_SECRET'] = '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'
-app.config['GOOGLE_DISCOVERY_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
+app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+app.config['GOOGLE_DISCOVERY_URL'] = os.getenv(
+    'GOOGLE_DISCOVERY_URL',
+    'https://accounts.google.com/.well-known/openid-configuration'
+)
 
 # Register Google OAuth service
 oauth.register(
@@ -497,4 +500,5 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=False,port=5000)
+    port = int(os.getenv("PORT", 5000))
+    app.run(debug=False, port=port)
