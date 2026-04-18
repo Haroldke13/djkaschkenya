@@ -1,0 +1,39 @@
+# Version control
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Environment secrets – injected at runtime via Render / Docker --env
+.env
+
+# Temporary runtime data (recreated by the app)
+temp_faces/
+static/faces/
+
+# Debug images written by the verify_face route during development
+debug_*.jpg
+
+# Editor and OS artefacts
+.vscode/
+.idea/
+*.log
+*.tmp
+*.temp
+*.orig
+*.bak
+*~
+
+# Build artefacts
+*.egg-info/
+dist/
+build/

@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: djkaschkenya
+    runtime: docker
+    # Render builds from the Dockerfile in the repo root
+    dockerfilePath: ./Dockerfile
+    plan: free
+
+    # Environment variables – set secret values in the Render dashboard
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true        # Render auto-generates a secure random value
+      - key: MONGO_URI
+        sync: false                # Set manually in the Render dashboard
+      - key: MONGO_DB_NAME
+        sync: false
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USE_TLS
+        value: "true"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_DEFAULT_SENDER
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_DISCOVERY_URL
+        value: https://accounts.google.com/.well-known/openid-configuration
